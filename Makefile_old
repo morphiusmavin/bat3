@@ -1,0 +1,81 @@
+#CC=/path/to/your/compiler
+#snapshotdir = /path/to/snapshot/dir
+sources = ups-monitor.c bat3dump.c bat3.c avr.c file1.c IntArray.c ByteArray.c serial1.c term1.c net1.c process1.c
+headers = base.h avr.h file1.h bat3.h IntArray.h ByteArray.h serial1.h term1.h net1.h process1.h
+docs = GettingStarted.txt MANUAL.txt
+products = bat3 bat3dump ups-monitor
+build: all
+
+bat3: bat3.o avr.o file1.o IntArray.o ByteArray.o serial1.o term1.o net1.o process1.o $(sources:%.c=%.md5.o) $(headers:%.h=%.md5h.o)
+bat3dump: bat3dump.o $(sources:%.c=%.md5.o) $(headers:%.h=%.md5h.o)
+ups-monitor: ups-monitor.o avr.o file1.o IntArray.o ByteArray.o serial1.o term1.o net1.o process1.o $(sources:%.c=%.md5.o) $(headers:%.h=%.md5h.o)
+draw: draw.o filter.o $(sources:%.c=%.md5.o) $(headers:%.h=%.md5h.o)
+	$(CC) $$< -o $@ -L/usr/X11R6/lib -I${LYB}/.. -lX11
+ifdef snapshotdir
+all:  $(products) $(sources:%=$(snapshotdir)/%) $(headers:%=$(snapshotdir)/%) $(products:%=$(snapshotdir)/%) $(docs:%=$(snapshotdir)/%) $(snapshotdir)/Makefile
+else
+all: $(products)
+endif
+
+%.d: %.c
+	@set -e; rm -f $@; \
+	$(CC) -MM $(CPPFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+%.md5.c: %.c
+	@echo "static char inf[] = __DATE__ \" \" __TIME__ \" $(shell md5sum $<)\";" > $@
+
+%.md5h.c: %.h
+	@echo "static char inf[] = __DATE__ \" \" __TIME__ \" $(shell md5sum $<)\";" > $@
+
+%.dc: %.c
+	@echo -e "$(snapshotdir)/$<: $<\n\tcp $< $(snapshotdir)/$<" > $@
+	@echo $(patsubst %.c,%.md5.c,$<): $< >> $@
+
+%.dh: %.h
+	@echo -e "$(snapshotdir)/$<: $<\n\tcp $< $(snapshotdir)/$<" > $@
+
+%.dt: %.txt
+	@echo -e "$(snapshotdir)/$<: $<\n\tcp $< $(snapshotdir)/$<" > $@
+
+%.de: %
+	@echo -e "$(snapshotdir)/$<: $<\n\tcp $< $(snapshotdir)/$<" > $@
+
+$(snapshotdir)/Makefile: Makefile ../Makefile.def
+	@echo "creating Makefile in snapshot directory"
+	@echo "#CC=/path/to/your/compiler" > $(snapshotdir)/Makefile
+	@echo "#snapshotdir = /path/to/snapshot/dir" >> $(snapshotdir)/Makefile
+	@head --lines=-3 Makefile >> $(snapshotdir)/Makefile
+	@cat ../Makefile.def >> $(snapshotdir)/Makefile >> $(snapshotdir)/Makefile
+
+ifneq ($(MAKECMDGOALS),clean)
+-include $(sources:.c=.d)
+ifdef snapshotdir
+-include $(headers:.h=.dh)
+-include $(sources:.c=.dc)
+-include $(docs:.txt=.dt)
+-include $(products:%=%.de)
+endif
+endif
+
+clean:
+	rm -f *.o $(products) *~ *.d *.dc *.de *.dh *.dt *.md5.c *.md5h.c
+	find . -empty -delete
+
+tarball: all
+	@cd $(snapshotdir) && \
+	cd .. && \
+	DIR=$(lastword $(subst /, ,$(shell pwd))) && \
+	NOW=`date +%Y%m%d%H%M%S` && \
+	echo "Creating tarball $$DIR-$$NOW.tar.gz" && \
+	tar -czf $$DIR-$$NOW.tar.gz $$DIR/ && \
+	ln -sf $$DIR-$$NOW.tar.gz $$DIR.tar.gz
+
+# This makefile may look complicated, but it's purposes it to do 3 simple things:
+# 1. automatically generate header file dependencies
+# 2. automatically insert compilation date/time and md5sum of each source file
+# 3. create snapshots of the source tree suitable for distribution.
+#    this is useful because the original source contains symlinks that allow
+#    library files to be used in multiple places, and a two-part Makefile
+#    system to eliminate redundancy.

@@ -1,0 +1,178 @@
+Getting Started with the TS-BAT3 
+--------------------------------
+
+The TS-BAT3 board is a PC104 daughter card which provides 5V of regulated
+DC voltage to the PC104 bus, and consequently, everything on that bus.
+The TS-BAT3 board is designed to operate with the TS-72xx series of
+single-board computers, and can supply up to 1000mA of current.  It
+is powered by three NiMH cells with a rated capacity of 2000mAh.
+
+Please note that to use the TS-BAT3 board you will need to connect a 7-28V
+power source to the box shaped connector on the TS-BAT3 board.  Do not
+attempt to power either the TS-BAT3 or the TS-72XX board from the 5V supply
+pins.
+
+The TS-BAT3 is shipped from the factory with jumper JP3 ON.  This jumper 
+disables the battery backup function.  After the TS-BAT3 board is connected
+to the main board, this jumper must be removed to enable the battery to
+power the device.  If battery power is not desired (e.g. when shipping
+the unit or when wanting to power down) the jumper should be put back on.
+
+The LED on the BAT3 board indicates the current state of the board, as
+follows:
+	FLASHING: battery is being charged
+	ON: board running off A/C power, battery not being charged
+	OFF: board running off battery power (or off)
+
+Access to the TS-BAT3 functions is via the program "bat3".  This program
+has several options which allow for manual or automatic control of the
+board.  The "--help" option will show all command line option. When run 
+without any options this program will return information about the current 
+state of the board.  The two main functions of interest are:
+
+1. Sleep
+Command line options:
+   --sleep <seconds>
+
+The sleep option causes the board to go into a low power state for 
+approximately the specified number of seconds.  The attached TS-72XX board
+will be booted up when the sleep period is over.  Sleep can be aborted by
+temporarily connecting a jumper across pins 5 and 6 of the "ISP" header on
+the board.  This header is located between the batteries and the PC104
+connected, near the edge of the board. The diagram below shows how the 
+pins in this header are arranged:
+
+ |   | |   | |   |    2 4 6   ||
+ |   | |   | |   |    1 3 5   ||
+ +---+ +---+ +---+    .ISP    ++
+
+   ^     ^     ^              ^
+   |     |     |              |
+    \    |    /            PC104
+     batteries          connector
+
+
+
+2. Charging
+Command line options:
+   --on <seconds> --off <seconds> --charge <current>
+
+The "charge" option *must* be last; all options after it will be ignored.
+All options except "charge" are optional.
+
+<current> is the number of milliAmps to charge with.  This value must be 
+between 60 and 400.
+
+<on> is the number of seconds to charge for before allowing the battery to
+"rest".  The default value is 60.
+
+<off> is the number of seconds to stop charging to allow the battery to
+rest, cool off, etc.  The default value is 60.
+
+WARNING: The above settings have been chosen conservatively to maintain
+battery life and avoid dangerous situations such as overheating.  Do not
+alter these values without a full understanding of the monitoring necessary
+to avoid risk of reduced battery life, overheating, fire, and battery damage 
+or explosion.
+
+
+Installation
+------------
+
+The latest version of the bat3 program can be downloaded from:
+    ftp://ftp.embeddedarm.com/bat3/
+
+In this directory you will find several files; consult the MANIFEST file
+to determine which files you need to download for your purposes.
+
+To automatically charge the battery whenever possible, modify the following 
+script to contain the appropriate paths, and add it to your init script:
+
+insmod tsuart0.o
+insmod tsuart-bat3.o
+bat3 --charge 400 &
+
+This will load the necessary drivers to communicate with the BAT3 board,
+and will run the "bat3" program as a daemon with the recommended charging
+current and duty cycle.
+
+
+Advanced Charging Features
+--------------------------
+
+The "bat3" program provides an interface to allow remote logging and control
+over the charging process.  The bat3 program listens for commands on UDP port
+4000.
+
+Here is the C structure corresponding to the packets the BAT3 recognizes:
+
+struct BAT3UDPcommand {
+  int command;
+  union {
+    struct command1 { // start sending BAT3 info packets
+      int port;
+    } cmd1;
+    struct command2 { // stop sending BAT3 info packets
+    } cmd2;
+    struct command3 { // change target current
+      int targetI; // in milliAmps
+    } cmd3;
+    struct command4 { // set target current and duty cycle
+      int targetI; // in milliAmps
+      int time_on; // in seconds
+      int time_off; // in seconds
+    } cmd4;
+  };
+} _PACK_;
+
+Command 1:
+This tells bat3 to start sending detailed battery information at 1Hz.
+These packets are sent to the UDP port of the host that sends the request.
+That is, the bat3 program looks at the source IP address of the request
+packet and sends to that address, at the port number specified in the request.
+
+The C structure of the packets sent by the bat3 is:
+
+struct bat3Info {
+  int t; // time
+  float supplyV; // supply voltage
+  float regV; // regulated supply voltage
+  float battV; // battery voltage
+  int battI; // battery current in microamps
+  float tempF; // temperature in F
+  word pwmt; // cycle time for PWM generation regulating charge current
+  float pwmlo; // low-time for PWM generation regulating charge current
+  dword pwm1en:1, // set if PWM1 is enabled
+        pwm2en:1, // set if PWM2 is enabled
+        offset:1, // reserved
+        opamp:1,  // must be enabled to read battery current
+        buck:1,   // reserved
+        led:1,    // set if the LED on the board is on
+	jp3:1,    // set if JP3 on the board is on
+        onbatt:1, // set if running on batteries
+        softJP3:1,// set automatically if battery voltage drops too low
+        locked:1; // set if bat3 has locked onto the target charge current
+  dword reserved[18]; // all unused bits are set to zero
+} _PACK_;
+
+Note: The voltages and currents in the above packet should only be considered
+approximate.
+Warning: The temperature should not be used for critical charging decisions 
+due to its location on the BAT3 board.
+
+Command 2:
+This tells bat3 to stop sending information packets.
+
+Command 3:
+This tells the bat3 to start charging the battery continuously at the specified
+current level in milliAmps.  Your program *must* monitor battery information
+(initiated by sending command 1) to determine when to stop charging.
+
+Command 4:
+This tells the bat3 to start charging the battery at the specified current 
+level in milliAmps.   Charging is enabled for time_on seconds and then is
+shut off for time_off seconds and then the cycle is repeated indefinitely.
+You must determine whether or not it is necessary to monitor battery 
+information to determine when charging is complete.
+
+

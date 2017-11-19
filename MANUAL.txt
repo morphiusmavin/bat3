@@ -1,0 +1,371 @@
+TS-BAT3 User's Manual
+*** PRELIMINARY ***
+
+I. Introduction
+
+The TS-BAT3 board is a PC104 daughter card which provides 5V of regulated
+DC voltage to the PC104 bus.  Although designed to operate with the TS-7XXX
+series of products, it should work with any PC104 main board, provided that
+the appropriate software is installed.  It is powered by three NiMH cells 
+with a rated capacity of 2000mAh.
+
+II. Getting Started
+
+As shipped from the factory, the TS-BAT3 board requires a few steps to
+become operational:
+
+1. With all power disconnected, plug the TS-BAT3 board into the main board.
+
+2. Download and install the lastest drivers and application software.
+
+The software is divided into the following parts:
+- TS-UART serial driver core (tsuart0.o)
+    This is the same core driver currently shipping with all our products
+    which have a TS-UART: TS-7260, TS-7300, TS-7400, etc...
+- TS-BAT3 serial driver loader (tsuart-bat3.o)
+    The TS-UART core is modular and implements all the serial driver 
+    functionality.  The loader simply registers a particular serial port or
+    ports with the core so they can be used, as well as implementing any
+    auxiliary functionality, if needed.
+- TS-BAT3 utility/charging daemon (bat3)
+    This program provides the ability to directly view and change various
+    parameters of the TS-BAT3.  The "--help" option shows various options
+    that are available.  Many of the options available are useful only for
+    debugging and experimentation purposes.  This program also provides an
+    option to run a default charging algorithm to try to keep the battery
+    charged.  In this mode the program runs as a daemon (background process).
+- Source code (bat3src.tar.gz)
+    A gzipped tar file is provided which contains the source code for the
+    TS-BAT3 utility as well as sample code for interfacing with this program
+    to perform advanced network battery monitoring and charging functions.
+
+The above software can be obtained at the following URL:
+	ftp://ftp.embeddedarm.com/pc104-peripherals/ts-bat3/ts-72xx-linux24/
+
+To install the software it is necessary to perform the following steps:
+  - copy the driver files and the bat3 program to the board that the
+    TS-BAT3 will be attached to.
+  - add the appropriate lines to your startup script to load the following
+    modules: first "tsuart0.o", then "tsuart-bat3.o".  It may not be
+    necessary to load "tsuart0.o" if your startup script is already loading
+    it.
+  - add the following line to your startup script to start the charging 
+    daemon whenever the board is booted:
+       bat3 --charge 400 &
+  - if you want to automatically shut down power X seconds after a power
+    failure (e.g. UPS functionality), change the above line to read:
+       bat3 --shutdown X --charge 400 &
+    Be sure to replace X with the desired number of seconds.  You will also
+    need to install "ups-monitor" in the proper location, probably
+    /etc/init.d, but be sure to check your shutdown scripts to verify 
+    that the system halt script (e.g. /etc/init.d/halt) calls this script.
+
+    The command "shutdown -h now" is used to shut the system down; if this
+    is inappropriate for your system you will need to download the source
+    package and re-compile for your system.
+
+3. Connect an appropriate power supply to the TS-BAT3 board.
+
+The TS-BAT3 can either be powered with a 7-28V DC power source via the square
+connector on the corner of the device, or with a regulated 5V DC power source
+via the pair of pins labelled "5V  GND" which also indicates the correct
+polarity required.
+
+When using the TS-BAT3 board do not attempt to apply power to any point on
+the main board; only utilize one of the two points on the TS-BAT3 mentioned
+in the previous paragraph.
+
+4. Remove the "BATTERY DISABLE" jumper. (JP3)
+
+This jumper is provided as a means for disabling the battery backup and
+powering function.  This is useful for when battery power is not required
+or desired, such as when shipping the unit or for storage purposes.
+
+As long as JP3 is removed, the TS-BAT3 board will provide power when
+insufficient mains power is available, so long as sufficient battery charge
+is left.  When JP3 is present, the TS-BAT3 board will shut down and provide
+no power when mains power is not present, regardless of battery state.
+
+5. Power up or reboot the main board.
+
+If everything is installed and running correctly, the LED on the TS-BAT3
+board will start blinking immediately after bootup is complete.
+
+
+
+III. Hardware Components
+
+Description of Operation
+------------------------
+
+The TS-BAT3 board has several logical components which provide the means
+to monitor and charge the battery and provide power to various sub-systems.
+The block diagram below shows how these components are connected.  The
+charging control circuit is powered either by regulated input voltage, or
+by the batteries themselves. It controls battery charging levels through 
+pulse width modulation of regulated input voltage.  It also has several
+analog to digital circuits which allow it to monitor battery voltage,
+charge/discharge current, and so forth.  The charging control circuit 
+provides an interface via the serial port on the TS-BAT3 board.  Please
+see the software section for more information on this interface.
+
+The charge control circuit also provides a low-power sleep mode.  In this
+mode the TS-BAT3 will power down the main board, itself, and any other
+connected boards for a specified period of time.  When the time has elapsed,
+power will be restored, rebooting the main board.
+
+
+Block Diagram
+-------------
+
+                                                                             
+                                                                             
+            +-----------+           +-----------+                            
+            |   buck    |           |   boost   |                             
+ 7-28V o----|           |       /---|           |----> To PC/104            
+            | regulator |       +   | regulator |                            
+            +-----------+     _/ \_ +-----------+                            
+                  |           ^   ^                                          
+                  |           |   |                                          
+    5V o----------+-----------/   |                                          
+                  |               |                                          
+                  |   /-----------+                                          
+                  |   |           |                                          
+                  |   |         +---+                                       
+                  V   V         | B |                                        
+                  -   -         | A |                                        
+                  |   |         | T |                                        
+                   \ /          | T |                                        
+                    +           | E |                                  
+                    |           | R |                   
+              +----------+      | I |                                        
+              | charging |----->| E |                                        
+              | control  |      | S |                                        
+              +----------+      +---+                                        
+                                                                             
+
+Jumpers
+-------
+
+There are five (5) jumper pins of interest on the TS-BAT3 board. These
+jumpers control the I/O address and IRQ settings, as well as battery
+function enabling.  It may be necessary to alter these jumpers to avoid
+a conflict with other daughter cards connected to the main board.
+
+
+JP1 JP2   I/O address
+OFF OFF   0x100-0x103
+OFF  ON   0x200-0x203
+ ON OFF   0x110-0x113
+ ON  ON   0x210-0x213
+
+JP3       Function
+OFF       battery power enabled
+ ON       battery will not supply power
+
+JP4 JP5   IRQ
+OFF OFF   none (do not use this setting)
+OFF  ON   6 (Linux interrupt 33)
+ ON OFF   5 (Linux interrupt 32)
+ ON  ON   6, with IRQ sharing enabled
+
+There is also an auxiliary jumper position on the "ISP" header:
+
+ISP5/6
+OFF       normal condition
+ ON       reset board from extended sleep mode
+
+
+
+ |   | |   | |   |    2 4 6   ||
+ |   | |   | |   |    1 3 5   ||
+ +---+ +---+ +---+    .ISP    ++
+
+   ^     ^     ^              ^
+   |     |     |              |
+    \    |    /            PC104
+     batteries          connector
+
+
+The ISP5/6 is a reset function.  Momentarily apply a jumper across pins
+5 and 6 of the ISP header as shown in the diagram above.  This provides a
+means for prematurely terminating the low-power sleep mode.
+
+
+LED function
+------------
+
+The green LED on the TS-BAT3 board can be used to display status information.
+The "bat3" program uses this LED as followings: when power is on and the
+battery is actively being charged, the LED will flash.  When power is on,
+but the battery is not currently being charged, the LED will remain on solid.
+When power is off, (running on battery or not) the LED will be off.
+
+
+
+IV. Software Components
+
+Safety
+------
+
+The battery charging procedures for the TS-BAT3 have been chosen 
+conservatively to maintain battery life and avoid dangerous situations 
+such as overheating.   In exchange for this safety the batteries charge
+at a relatively slow pace.  You should expect initial charging to take an
+uninterrupted 24 hours, with recharging time falling to under 16 hours
+after the battery has been recharged a few times and has finished reforming.
+
+With more aggressive charging faster charge times are possible. However
+proper implementation of such algorithms require careful attention to
+operational battery parameters across a range of temperatures and battery 
+conditions.  Careless or improper charging may result in reduced battery 
+life, overheating, battery damage, leaking, fire or explosion.
+
+The charging circuitry tries to provide some guards against dangerous 
+conditions:
+- current limiting (via R1 and R2)
+  Except under low battery conditions charging current is limited to
+  around 500mA.  However this current may not be maintainable across all
+  battery conditions and temperatures.  Therefore to maintain a constant
+  charging current it is recommended that the maximum charge current be
+  limited to 400mA.
+- automatic shutdown
+  The charging control circuitry provides the ability to charge the battery
+  with pulse-width modulation.  However this provide only (fairly) constant
+  voltage and therefore requires interaction by the charging daemon to alter 
+  the PWM duty cycle to maintain constant current.  The charge control
+  circuitry will automatically shut off charging if it receives no commands
+  from the charging daemon for approximately 120 seconds, to guard against
+  over-charging in the event of a software crash.
+- environmental temperature sensor
+  The temperature sensor on the TS-BAT3 board measures the ambient 
+  temperature of the board and provides this information to the charging 
+  daemon.  DO NOT use this to detect temperature swings of the battery
+  to make end of charge determination unless you can establish that it 
+  can reliably do so for your application.  It is entirely possible that
+  the coupling between the temperature sensor and the battery temperature
+  may not be tight enough to make critical fast charging decisions.
+
+
+Charging Strategy
+-----------------
+
+The supplied bat3 charging daemon implements a simple, conservative 
+duty-cycled constant current charging algorithm.  The charging current
+and duty cycle can easily be altered for a given application.  For instance,
+a solar driven unit might require the charging current to be lowered due
+to limitations of available power.  Care must be taken in choosing
+alternate charging parameters to avoid overheating.  As a general rule,
+limit average current over one period to C/10 unless you will be closely
+monitoring battery parameters.
+
+By default, charging occurs in 2 minute periods with a 50% duty cycle, and
+at a charging current of 400mA.  This results in an average C/10 charging
+current which can be maintained indefinitely with no safety issues.  
+Battery life reduction is avoided, in constrast to a constant C/10 charge.
+
+Interface to Charging Control Circuitry
+---------------------------------------
+
+The charge control circuitry is implemented with an AVR microcontroller.
+Communication with the AVR is accomplished via the TS-UART (serial port),
+which is accessible via /dev/ttyT3S when the appropriate drivers are
+loaded.  This serial communication is framed using modified HDLC framing
+with a checksum byte for each frame (packet).  
+
+The AVR on the TS-BAT3 board sends frames containing state information
+approximately 30 times per second.  The structure of this packet is 
+documented in "bat3.h" (struct BAT3reply) in the source code package.
+When the user application on the main board (e.g. the bat3 daemon) wishes
+to change the state of the charge control circuitry, it sends a request frame
+(struct BAT3request) to the AVR.  Subsequent frames will reflect this state
+change to acknowledge the change.
+
+The source code package provides abstractions which reduce the amount of
+work an application must do to communicate with the AVR:
+     bat3.c contains functionality specific to the TS-BAT3 board
+     avr.c contains functionality specific to any TS board with an AVR
+     serial.c contains functionality for sending and receive serial frames
+     file.c contains generic file related functionality
+     ByteArray.c contains functions for dealing with byte arrays
+
+"bat3" options
+--------------
+
+The "bat3" program processes options in a slightly non-standard way.  First,
+unknown options are silently ignored.  Options which are missing their
+required parameters get default parameters, which normally means zero (0),
+which is probably not what you want. For the remainder of the options
+it is necessary to know how the bat3 program operates.
+
+The bat3 program was designed as a utility to fetch and change the state
+of the TS-BAT3.  When run with no parameters it merely waits to receive
+a state frame from the AVR, then prints out the current state in a human
+readable text format.  When options are supplied that modify the AVR
+state, these options are processed, and when option processing is finished,
+a packet is constructed and sent to the AVR.  If the AVR does not
+acknowledging the state change the packet will be resent up to a retry
+limit.  The options which change the AVR state are:
+	--pwm1
+	--pwm2
+	--offset
+	--opamp
+	--buck   (currently un-implemented)
+	--led
+	--pwmlo
+	--pwmt
+	--sleep
+The "--help" option describes these options and their parameters in more
+detail.
+
+To run the charging daemon the "--charge" option must be specified.  This
+causes the program to detach from the controlling terminal immediately;
+therefore any options after it will be ignored, as well as any options
+before it which do not directly pertain to the charging algorithm (i.e.
+any of the options in the previous paragraph).  Any additional options
+to specify charging parameters (besides current, which is a parameter to
+--charge itself) must come before the "--charge" option.  These additional
+options (without their required parameters) are:
+        --on
+        --off
+        --log
+
+In general it is not even necessary to specify anything but the charge
+option with its required parameter, as all charging parameters can be 
+changed on the fly as documented in the next section.
+
+Advanced Monitoring and Charging
+--------------------------------
+
+The bat3 program listens on UDP port 4000 for commands.  The structure of
+these commands are documented in bat3.h (struct BAT3UDPcommand).  These
+commands are:
+
+Command 1:
+This tells bat3 to start sending detailed battery information at 1Hz.
+These packets are sent to the UDP port of the host that sends the request.
+That is, the bat3 program looks at the source IP address of the request
+packet and sends to that address, at the port number specified in the request.
+Only one host at a time (the last one to send this request) will receive these 
+info packets.
+
+The structure of the packets sent by the bat3 is documented in bat3.h
+(struct bat3Info).  Note that the voltages and currents in this packet 
+should only be considered approximate unless you perform strict calibration
+on an individual board basis.
+
+Command 2:
+This tells bat3 to stop sending information packets.
+
+Command 3:
+This tells bat3 to start charging the battery continuously at the specified
+current level in milliAmps.  Your program *must* monitor battery information
+(initiated by sending command 1) to determine when to stop charging.
+
+Command 4:
+This tells bat3 to start charging the battery at the specified current 
+level in milliAmps.   Charging is enabled for time_on seconds and then is
+shut off for time_off seconds and then the cycle is repeated indefinitely.
+You must determine whether or not it is necessary to monitor battery 
+information to determine when charging is complete.
+

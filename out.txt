@@ -1,0 +1,36 @@
+
+Couldn't Open Config File: (null)
+Read Docs For Configuration Settings
+Function Line Spacing              : 2
+Use Tabs In Indenting              : No
+Indent Spacing Length              : 4
+Comments With Code                 : 50
+Comments With No Code              : 0
+Remove Non-ASCII Chars             : Yes But Not Graphic Chars
+Non-ASCII Chars In Quotes To Octal : No
+Top-level Open Braces On New Line  : Yes
+Open Braces On New Line            : Yes
+Program Output                     : Yes
+Internal Queue Buffer Size         : 10
+
+Feed Me, Feed Me Code ...
+Number Of Lines Processed :  10 20 30 33 (In 0 Hours 0 Minutes 0 Seconds)
+Cleaning Up Dinner ... Done !
+
+Couldn't Open Config File: (null)
+Read Docs For Configuration Settings
+Function Line Spacing              : 2
+Use Tabs In Indenting              : Yes
+Indent Spacing Length              : 4
+Comments With Code                 : 50
+Comments With No Code              : 0
+Remove Non-ASCII Chars             : Yes But Not Graphic Chars
+Non-ASCII Chars In Quotes To Octal : No
+Top-level Open Braces On New Line  : Yes
+Open Braces On New Line            : Yes
+Program Output                     : Yes
+Internal Queue Buffer Size         : 10
+
+Feed Me, Feed Me Code ...
+Number Of Lines Processed :  10 20 30 32 (In 0 Hours 0 Minutes 0 Seconds)
+Cleaning Up Dinner ... Done !
