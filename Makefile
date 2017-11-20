@@ -99,11 +99,22 @@ GNUNOANSI = -g -gnu99 -Wstrict-prototypes
 
 BULD_TARGET = $(PROJECT)
 
-all : bat3 bat3dump ups-monitor
-#llist_test_threads llist_test_threads_rw
+all : bat3 bat3dump ups-monitor server client # server_udp client_udp
 
-#sched.o: sched.c tasks.h
-#	${CC} ${INCLUDE_PATHS} ${CC_FLAGS} -c -pthread sched.c
+server.o: server.c
+	${CC} ${INCLUDE_PATHS} ${CC_FLAGS} -c server.c
+
+client.o: client.c
+	${CC} ${INCLUDE_PATHS} ${CC_FLAGS} -c client.c
+
+#server_udp.o: server_udp.c
+#	${CC} ${INCLUDE_PATHS} ${CC_FLAGS} -c server_udp.c
+
+client.o: client.c
+	${CC} ${INCLUDE_PATHS} ${CC_FLAGS} -c client.c
+
+#client_udp.o: client_udp.c
+#	${CC} ${INCLUDE_PATHS} ${CC_FLAGS} -c client_udp.c
 
 avr.o: avr.c avr.h file1.h term1.h 
 	${CC} ${INCLUDE_PATHS} ${CC_FLAGS} -c avr.c
@@ -146,10 +157,22 @@ ups-monitor: ups-monitor.o avr.o file1.o IntArray.o ByteArray.o serial1.o term1.
 
 bat3dump: bat3dump.o
 	${CC} -static bat3dump.o -o bat3dump
+
+client: client.o
+	${CC} -static client.o -o client
+	 
+server: server.o
+	${CC} -static server.o -o server
+	 
+#client_udp: client_udp.o
+#	${CC} -static client_udp.o -o client_udp
+	 
+#server_udp: server_udp.o
+#	${CC} -static server_udp.o -o server_udp
 	 
 clean :
 	rm -f *.o *~ *# core  \
-	bat3 bat3dump ups-monitor
+	bat3 bat3dump ups-monitor client server # client_udp server_udp
 
 #base.h bat3.c bat3dump.c bat3.h ByteArray.c ByteArray.h file1.c file1.h IntArray.c IntArray.h net1.c net1.h process1.c
 #process1.h serial1.c serial1.h term1.c term1.h ups-monitor.c 

@@ -112,7 +112,7 @@ int BAT3EEPROMcallback(ByteArrayRef req1,ByteArrayRef rep1)
 }
 
 
-#define BYTE_ARRAY_REF_STRUCT(name) BAR((byte *)name,sizeof(*(name)))
+//#define BYTE_ARRAY_REF_STRUCT(name) BAR((byte *)name,sizeof(*(name)))
 
 void BAT3writeEEPROM(FILE *f,byte adrs,byte value)
 {
@@ -314,7 +314,7 @@ int argc,char **argv)
 				}
 				else
 				{
-//printf("Charging with %dmA...\n",val);
+					//printf("Charging with %dmA...\n",val);
 					BAT3BatteryCharge(file,1000*val,on,off,shutdelay);
 				}
 				break;
@@ -518,6 +518,7 @@ void BAT3chargeState_Init(BAT3chargeState *state,int targetI,int on,int off)
 	state->last_t = 0;
 	state->txSocket = -1;
 	state->rxSocket = netUDPopen(4000,1);
+	printf("open UDP: %d %d\n",state->rxSocket,state->txSocket);
 /*
 strcpy(state->IPADRS,"192.168.0.169");
 state->toPort = 2000;
@@ -565,6 +566,7 @@ void BAT3UDPlogUpdate(BAT3chargeState *state,BAT3reply *rep,time_t t)
 			if (state->txSocket > -1)
 			{
 				netUDPtx(state->txSocket,BAR(&inf,sizeof(bat3Info)),&state->to);
+				printf("sending UDP...\n");
 			}
 			state->numSamples = 0;
 		}
@@ -645,8 +647,9 @@ void BAT3UDPcommandCheck(BAT3chargeState *state)
 				(from.sin_addr.s_addr>>8)&0xFF,
 				(from.sin_addr.s_addr>>16)&0xFF,
 				(from.sin_addr.s_addr>>24)&0xFF);
-			for(i = 0;i < 20;i++)
-				printf("ipaddr: %c",state-IPADRS[i]);
+			printf("IPADRS: %s\n",IPADRS);
+//			for(i = 0;i < 20;i++)
+//				printf("ipaddr: %c",state-IPADRS[i]);
 			state->toPort = cmd.cmd1.port;
 			if (state->txSocket > -1)
 			{
@@ -733,8 +736,6 @@ void BAT3BatteryCharge(FILE *f,int targetI,int on,int off,int shutdelay)
 
 	processDaemonize();
 
-	printf("BAT3BatteryCharge\n");
-
 	BAT3chargeState_Init(&state,targetI,on,off);
 	while (state.running)
 	{
@@ -756,6 +757,8 @@ void BAT3BatteryCharge(FILE *f,int targetI,int on,int off,int shutdelay)
 					if (shutdown_pending > 0)	  // already pending shutdown?
 					{
 // time to shutdown now?
+						if(shutdown_pending < 3)
+							printf("shutting down system\n");
 						if (--shutdown_pending == 0)
 						{
 // Change the next line if you need a different command

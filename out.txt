@@ -1,36 +1,122 @@
-
-Couldn't Open Config File: (null)
-Read Docs For Configuration Settings
-Function Line Spacing              : 2
-Use Tabs In Indenting              : No
-Indent Spacing Length              : 4
-Comments With Code                 : 50
-Comments With No Code              : 0
-Remove Non-ASCII Chars             : Yes But Not Graphic Chars
-Non-ASCII Chars In Quotes To Octal : No
-Top-level Open Braces On New Line  : Yes
-Open Braces On New Line            : Yes
-Program Output                     : Yes
-Internal Queue Buffer Size         : 10
-
-Feed Me, Feed Me Code ...
-Number Of Lines Processed :  10 20 30 33 (In 0 Hours 0 Minutes 0 Seconds)
-Cleaning Up Dinner ... Done !
-
-Couldn't Open Config File: (null)
-Read Docs For Configuration Settings
-Function Line Spacing              : 2
-Use Tabs In Indenting              : Yes
-Indent Spacing Length              : 4
-Comments With Code                 : 50
-Comments With No Code              : 0
-Remove Non-ASCII Chars             : Yes But Not Graphic Chars
-Non-ASCII Chars In Quotes To Octal : No
-Top-level Open Braces On New Line  : Yes
-Open Braces On New Line            : Yes
-Program Output                     : Yes
-Internal Queue Buffer Size         : 10
-
-Feed Me, Feed Me Code ...
-Number Of Lines Processed :  10 20 30 32 (In 0 Hours 0 Minutes 0 Seconds)
-Cleaning Up Dinner ... Done !
+Makefile:114: warning: overriding recipe for target 'client.o'
+Makefile:108: warning: ignoring old recipe for target 'client.o'
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c bat3.c
+In file included from bat3.c:13:
+ByteArray.h:7:2: warning: #warning "BYTE_ARRAY_Z defined"
+In file included from bat3.c:13:
+ByteArray.h:25: warning: data definition has no type or storage class
+In file included from file1.h:7,
+                 from bat3.c:15:
+ByteArray.h:42:2: warning: #warning "BYTE_ARRAY_Z not defined"
+In file included from bat3.c:15:
+file1.h:9:2: warning: #warning "FILE_Z defined"
+In file included from avr.h:6,
+                 from bat3.h:5,
+                 from bat3.c:16:
+ByteArray.h:42:2: warning: #warning "BYTE_ARRAY_Z not defined"
+In file included from bat3.h:5,
+                 from bat3.c:16:
+avr.h:8:2: warning: #warning "AVR_Z defined"
+In file included from net1.h:8,
+                 from bat3.c:17:
+ByteArray.h:42:2: warning: #warning "BYTE_ARRAY_Z not defined"
+In file included from bat3.c:17:
+net1.h:10:2: warning: #warning "NET_Z defined"
+In file included from bat3.c:18:
+process1.h:5: warning: function declaration isn't a prototype
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c avr.c
+In file included from avr.h:6,
+                 from avr.c:5:
+ByteArray.h:7:2: warning: #warning "BYTE_ARRAY_Z defined"
+In file included from avr.h:6,
+                 from avr.c:5:
+ByteArray.h:25: warning: data definition has no type or storage class
+In file included from avr.c:5:
+avr.h:8:2: warning: #warning "AVR_Z defined"
+In file included from file1.h:7,
+                 from avr.c:6:
+ByteArray.h:42:2: warning: #warning "BYTE_ARRAY_Z not defined"
+In file included from avr.c:6:
+file1.h:9:2: warning: #warning "FILE_Z defined"
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c file1.c
+In file included from file1.h:7,
+                 from file1.c:9:
+ByteArray.h:7:2: warning: #warning "BYTE_ARRAY_Z defined"
+In file included from file1.h:7,
+                 from file1.c:9:
+ByteArray.h:25: warning: data definition has no type or storage class
+In file included from file1.c:9:
+file1.h:9:2: warning: #warning "FILE_Z defined"
+In file included from file1.c:10:
+ByteArray.h:42:2: warning: #warning "BYTE_ARRAY_Z not defined"
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c IntArray.c 
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c ByteArray.c 
+In file included from ByteArray.c:1:
+ByteArray.h:7:2: warning: #warning "BYTE_ARRAY_Z defined"
+In file included from ByteArray.c:1:
+ByteArray.h:25: warning: data definition has no type or storage class
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c serial1.c
+In file included from serial1.h:4,
+                 from serial1.c:3:
+ByteArray.h:7:2: warning: #warning "BYTE_ARRAY_Z defined"
+In file included from serial1.h:4,
+                 from serial1.c:3:
+ByteArray.h:25: warning: data definition has no type or storage class
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c term1.c
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c net1.c
+In file included from net1.h:8,
+                 from net1.c:7:
+ByteArray.h:7:2: warning: #warning "BYTE_ARRAY_Z defined"
+In file included from net1.h:8,
+                 from net1.c:7:
+ByteArray.h:25: warning: data definition has no type or storage class
+In file included from net1.c:7:
+net1.h:10:2: warning: #warning "NET_Z defined"
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c process1.c
+In file included from process1.c:7:
+process1.h:5: warning: function declaration isn't a prototype
+process1.c:54: warning: function declaration isn't a prototype
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -static bat3.o avr.o file1.o IntArray.o ByteArray.o serial1.o term1.o net1.o process1.o -o bat3
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c bat3dump.c 
+In file included from avr.h:6,
+                 from bat3.h:5,
+                 from bat3dump.c:2:
+ByteArray.h:7:2: warning: #warning "BYTE_ARRAY_Z defined"
+In file included from avr.h:6,
+                 from bat3.h:5,
+                 from bat3dump.c:2:
+ByteArray.h:25: warning: data definition has no type or storage class
+In file included from bat3.h:5,
+                 from bat3dump.c:2:
+avr.h:8:2: warning: #warning "AVR_Z defined"
+bat3dump.c:37: warning: function declaration isn't a prototype
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -static bat3dump.o -o bat3dump
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c ups-monitor.c
+In file included from ups-monitor.c:12:
+ByteArray.h:7:2: warning: #warning "BYTE_ARRAY_Z defined"
+In file included from ups-monitor.c:12:
+ByteArray.h:25: warning: data definition has no type or storage class
+In file included from file1.h:7,
+                 from ups-monitor.c:14:
+ByteArray.h:42:2: warning: #warning "BYTE_ARRAY_Z not defined"
+In file included from ups-monitor.c:14:
+file1.h:9:2: warning: #warning "FILE_Z defined"
+In file included from avr.h:6,
+                 from bat3.h:5,
+                 from ups-monitor.c:15:
+ByteArray.h:42:2: warning: #warning "BYTE_ARRAY_Z not defined"
+In file included from bat3.h:5,
+                 from ups-monitor.c:15:
+avr.h:8:2: warning: #warning "AVR_Z defined"
+In file included from net1.h:8,
+                 from ups-monitor.c:16:
+ByteArray.h:42:2: warning: #warning "BYTE_ARRAY_Z not defined"
+In file included from ups-monitor.c:16:
+net1.h:10:2: warning: #warning "NET_Z defined"
+In file included from ups-monitor.c:17:
+process1.h:5: warning: function declaration isn't a prototype
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -static ups-monitor.o avr.o file1.o IntArray.o ByteArray.o serial1.o term1.o net1.o process1.o -o ups-monitor
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c server.c
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -static server.o -o server
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -I./home/dan/dev/arm/crosstool/gcc3/arm-linux/arm-linux/include/ -g -Wstrict-prototypes -mcpu=arm920t -mapcs-32 -c client.c
+/home/dan/dev/arm/crosstool/gcc3/arm-linux/bin/arm-linux-gcc -static client.o -o client

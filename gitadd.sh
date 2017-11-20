@@ -25,4 +25,21 @@ git add serial1.h
 git add term1.c
 git add term1.h
 git add ups-monitor.c
+git add x64/avr.h
+git add x64/base.h
+git add x64/bat3.h
+git add x64/ByteArray.c
+git add x64/ByteArray.h
+git add x64/do1.sh
+git add x64/file1.c
+git add x64/file1.h
+git add x64/IntArray.c
+git add x64/IntArray.h
+git add x64/Makefile
+git add x64/net1.c
+git add x64/net1.h
+git add x64/term1.c
+git add x64/term1.h
+git add x64/test_x64.c
 git status
+
